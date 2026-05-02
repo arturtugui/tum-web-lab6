@@ -1,0 +1,14 @@
+:root {
+  --bg: #fafafa;
+  --text: #1a1a1a;
+  --card-bg: #ffffff;
+  --accent: #4f46e5; /* Indigo */
+}
+
+/* Dark theme */
+[data-theme="dark"] {
+  --bg: #0a0a0a;
+  --text: #f5f5f5;
+  --card-bg: #1a1a1a;
+  --accent: #6366f1; /* Slightly lighter indigo for readability */
+}
