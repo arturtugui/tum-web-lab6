@@ -4,6 +4,7 @@ import ItemCard from './components/ItemCard'
 import './styles/App.css'
 
 function App() {
+  const [state, dispatch] = useReducer(reducer, { items: [] })
 
   return (
     <div className="app-container">

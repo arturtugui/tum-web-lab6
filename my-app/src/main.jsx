@@ -5,6 +5,8 @@ import './styles/global.css'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <CollectionProvider>
+      <App />
+    </CollectionProvider>
   </StrictMode>,
 )
