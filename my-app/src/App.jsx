@@ -1,5 +1,6 @@
 import Navbar from './components/Navbar'
 import FilterBar from './components/FilterBar'
+import ItemCard from './components/ItemCard'
 import './styles/App.css'
 
 function App() {
@@ -8,7 +9,14 @@ function App() {
     <div className="app-container">
       <Navbar />
       <FilterBar />
-      <div className="content-placeholder"></div>
+      <div className="main-grid">
+        <ItemCard />
+        <ItemCard />
+        <ItemCard />
+        <ItemCard />
+        <ItemCard />
+        <ItemCard />
+      </div>
     </div>
   )
 }
