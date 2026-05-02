@@ -1,5 +1,3 @@
-import { useReducer } from 'react'
-
 // we need to return a new state object
 // otherwise React will not know that it has changed 
 // and will not re-render the component
@@ -7,7 +5,7 @@ import { useReducer } from 'react'
 // state is a global variable accesible through useContext()
 // it contains items, theme, etc.
 
-function reducer(state, action) {
+export function reducer(state, action) {
   switch (action.type) {
     case 'ADD_ITEM': return { ...state, 
         // copy the old state 
