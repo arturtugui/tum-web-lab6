@@ -6,6 +6,9 @@
   background-color: var(--card-bg);
   border-bottom: 1px solid var(--border);
   height: 4.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 20;
 }
 
 .navbar-title {
