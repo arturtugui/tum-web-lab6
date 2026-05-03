@@ -1,22 +1,72 @@
 # Web Programming Laboratory 6 - Front-end
 
-reminder: when presenting mention that you know that useContext should not be used for lists (my item lists), but for low frequency updates (as was mentioned in the course topic), but i decided to use only React built-ins because I have never wrote a react only project myself:
+## Project Overview
 
-from theory
-**Limitation:** Every `useContext` consumer re-renders when the context value changes — even if the specific piece of data it uses didn't change. Fine for low-frequency updates (theme, auth), problematic for high-frequency (forms, lists).
+**My Interests Collection** is a personal interest tracker web application where users can organize, categorize, and manage items of interest (movies, books, games, etc.). The app allows users to add items with details, filter by category and status, search by title, and toggle between light/dark themes.
 
-on top of that say that you actually had the idea that the list is a high freq one, but you asked Claude and Gemini and they both said that that is not the case, ask the prof
+**Stack:** React 19 + Vite
 
-at the end say how would you handled the state if i were not using react built-ins based on what the professor listed here:
+## Features
 
-from theory:
-## 10. When to Use What
+- ✅ **CRUD Operations**: Add, edit, view, delete, and hide items
+- ✅ **Categorization**: 9 categories (Movies, Series, Anime, Games, Manga, Comics, Books, Albums, YouTube)
+- ✅ **Status Tracking**: Planned, In Progress, Completed, Dropped
+- ✅ **Filtering**: By category and status with combined filters
+- ✅ **Search**: Real-time search by item title
+- ✅ **Ratings**: Optional 1-10 rating system
+- ✅ **Persistence**: localStorage auto-saves all data
+- ✅ **Theme Toggle**: Light/dark mode with persistence
+- ✅ **Item Details Modal**: View all item characteristics in a modal
+- ✅ **Category-Specific Fields**: Dynamic fields based on item type (e.g., Genres for movies, Platform for games)
 
-- **Server data** (API calls, caching, loading states) → RTK Query, TanStack Query, SWR. Don't use Redux for this.
-- **Global UI state** (modals, themes, auth) → Zustand / Pinia / Angular Signals service. Simple, no ceremony.
-- **Complex domain logic** with many actors, audit trails, strict team contracts → Redux Toolkit / NgRx. The structure pays off.
-- **Most apps in 2026** → combination of server-state library + small global store. Full Redux is often overkill.
+## State Management Architecture
 
-searching uses useContext() even thought is technically a form 
+### By Location
 
-localStorage.removeItem('pit-collection') in browser console to reset the local storage
+**Local State (useState)**:
+- Menu visibility, form inputs, modal open/close states in individual components
+- Used for UI interactions that don't need global access
+
+**Global State (useContext)**:
+- **CollectionContext**: Items array with CRUD operations via useReducer
+- **UIContext**: Modal visibility, editing state, item viewing
+- **FilterContext**: Active category, status, search text filters
+- **ThemeContext**: Current theme (light/dark) with localStorage sync
+
+### By Type
+
+**Component Data** (local):
+- Button menu state, form input fields - low frequency, component-level
+
+**Domain Data** (global via CollectionContext):
+- Items collection with full CRUD - accessed by multiple components, persisted
+
+**UI State** (global via UIContext):
+- Modal open/close, which item is being edited/viewed - affects navbar and cards
+
+**Filtering State** (global via FilterContext):
+- Active filters and search - used by ItemList to display filtered results
+
+**Theme State** (global via ThemeContext):
+- Light/dark preference - low frequency updates, app-wide styling
+
+## Getting Started
+
+```bash
+# Install dependencies
+cd my-app
+npm install
+
+# Start development server
+npm run dev
+```
+
+Server runs on `http://localhost:5174/`
+
+## Reset Data
+
+To clear localStorage and reset to default items, run in browser console:
+```javascript
+localStorage.removeItem('pit-collection')
+```
+Then refresh the page.
