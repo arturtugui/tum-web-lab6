@@ -17,4 +17,6 @@ from theory:
 - **Complex domain logic** with many actors, audit trails, strict team contracts → Redux Toolkit / NgRx. The structure pays off.
 - **Most apps in 2026** → combination of server-state library + small global store. Full Redux is often overkill.
 
-searching uses useContext() even thought is technically a form because the seraching happens only when you click enter (no frequent updates)
+searching uses useContext() even thought is technically a form 
+
+localStorage.removeItem('pit-collection') in browser console to reset the local storage
