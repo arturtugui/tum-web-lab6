@@ -74,4 +74,3 @@ Then refresh the page.
 ## Project Links
 
 - GitHub Pages: https://arturtugui.github.io/tum-web-lab6/
-- Live Website: ...
