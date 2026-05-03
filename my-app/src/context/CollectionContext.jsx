@@ -54,6 +54,13 @@ const DEFAULT_ITEMS = [
     status: 'completed',
     coverUrl: 'https://i0.wp.com/ronitjauthor.com/wp-content/uploads/2025/08/Takopis-Original-Sin-2025-Official-Poster-e1754218186871.webp?resize=540%2C720&ssl=1',
   },
+  {
+    id: 8,
+    title: 'Supernatural',
+    category: 'series',
+    status: 'dropped',
+    coverUrl: 'https://m.media-amazon.com/images/M/MV5BMDFmMGZmMGItNGRjNC00NjVjLWI5ODEtNzhjMTE5MmJhN2FkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg',
+  },
 ]
 
 // Load initial state from localStorage or use default test data
