@@ -5,7 +5,7 @@ import './ItemList.css'
 
 function ItemList() {
     const { state } = useCollection()
-    const { activeCategory, activeStatus } = useFilter()
+    const { activeCategory, activeStatus, searchText } = useFilter()
 
     // Apply filtering logic
     let filtered = state.items.filter((item) => !item.isHidden)
@@ -16,6 +16,12 @@ function ItemList() {
 
     if (activeStatus !== 'all') {
         filtered = filtered.filter((item) => item.status === activeStatus)
+    }
+
+    if (searchText.trim() !== '') {
+        filtered = filtered.filter((item) => 
+            item.title.toLowerCase().includes(searchText.toLowerCase())
+        )
     }
 
     const hasNoItems = state.items.length === 0

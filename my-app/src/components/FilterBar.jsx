@@ -2,7 +2,7 @@ import { useFilter } from '../context/FilterContext.jsx'
 import './FilterBar.css'
 
 function FilterBar() {
-  const { activeCategory, setActiveCategory, activeStatus, setActiveStatus } = useFilter()
+  const { activeCategory, setActiveCategory, activeStatus, setActiveStatus, searchText, setSearchText } = useFilter()
 
   const categories = [
     { label: 'All', value: 'all' },
@@ -60,6 +60,8 @@ function FilterBar() {
           type="text"
           className="search-input"
           placeholder="Search by title..."
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
         />
       </div>
     </div>

@@ -5,6 +5,7 @@ const FilterContext = createContext()
 export function FilterProvider({ children }) {
   const [activeCategory, setActiveCategory] = useState('all')
   const [activeStatus, setActiveStatus] = useState('all')
+  const [searchText, setSearchText] = useState('')
 
   return (
     <FilterContext.Provider
@@ -13,6 +14,8 @@ export function FilterProvider({ children }) {
         setActiveCategory,
         activeStatus,
         setActiveStatus,
+        searchText,
+        setSearchText,
       }}
     >
       {children}
