@@ -1,6 +1,6 @@
 import Navbar from './components/Navbar'
 import FilterBar from './components/FilterBar'
-import ItemCard from './components/ItemCard'
+import ItemList from './components/ItemList'
 import './styles/App.css'
 
 function App() {
@@ -10,12 +10,7 @@ function App() {
       <Navbar />
       <FilterBar />
       <div className="main-grid">
-        <ItemCard />
-        <ItemCard />
-        <ItemCard />
-        <ItemCard />
-        <ItemCard />
-        <ItemCard />
+        <ItemList />
       </div>
     </div>
   )

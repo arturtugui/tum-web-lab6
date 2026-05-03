@@ -1,3 +1,6 @@
+import { useCollection } from '../context/CollectionContext'
+import ItemCard from './ItemCard'
+
 function ItemList() {
     const { state, dispatch } = useCollection()
 
@@ -11,3 +14,5 @@ function ItemList() {
         </div>
     )
 }
+
+export default ItemList
