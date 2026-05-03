@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { useCollection } from '../context/CollectionContext'
 import './ItemCard.css'
 
 function ItemCard({ item }) {
   const [menuOpen, setMenuOpen] = useState(false)
+  const { dispatch } = useCollection()
 
   return (
     <div className="item-card">
@@ -22,10 +24,18 @@ function ItemCard({ item }) {
             </button>
             {menuOpen && (
               <div className="dropdown-menu">
-                <button className="menu-item">View</button>
-                <button className="menu-item">Edit</button>
-                <button className="menu-item">Hide</button>
-                <button className="menu-item menu-item-danger">Delete</button>
+                <button className="menu-item" onClick={() => dispatch({ type: 'VIEW_ITEM', payload: item.id })}>
+                  View
+                </button>
+                <button className="menu-item" onClick={() => dispatch({ type: 'EDIT_ITEM', payload: item})}>
+                  Edit
+                </button>
+                <button className="menu-item" onClick={() => dispatch({ type: 'HIDE_ITEM', payload: item.id })}>
+                  Hide
+                </button>
+                <button className="menu-item menu-item-danger" onClick={() => dispatch({ type: 'DELETE_ITEM', payload: item.id })}>
+                  Delete
+                </button>
               </div>
             )}
           </div>

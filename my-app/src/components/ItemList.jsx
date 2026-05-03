@@ -3,7 +3,7 @@ import ItemCard from './ItemCard'
 import './ItemList.css'
 
 function ItemList() {
-    const { state, dispatch } = useCollection()
+    const { state } = useCollection()
 
     const visible = state.items.filter(item => !item.isHidden)
     const hasNoItems = state.items.length === 0
