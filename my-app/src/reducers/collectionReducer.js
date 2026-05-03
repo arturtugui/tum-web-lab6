@@ -7,18 +7,45 @@
 
 export function reducer(state, action) {
   switch (action.type) {
-    case 'ADD_ITEM': return { ...state, 
-        // copy the old state 
-        items: [...state.items, action.payload] } 
-        //replace items of the copy of state with a new array that includes the new item
-    case 'EDIT_ITEM': return { ...state, 
-        items: state.items.map(item => item.id === action.payload.id ? action.payload : item) }
-    case 'HIDE_ITEM': return { ...state, 
-        items: state.items.map(item => item.id === action.payload.id ? { ...item, hidden: true } : item) }
-    case 'UNHIDE_ITEM': return { ...state, 
-        items: state.items.map(item => item.id === action.payload.id ? { ...item, hidden: false } : item) }
-    case 'DELETE_ITEM': return { ...state, 
-        items: state.items.filter(item => item.id !== action.payload.id) }
+    case 'ADD_ITEM': {
+      console.log('Adding item:', action.payload)
+      return { ...state, 
+        items: [...state.items, action.payload]
+      }
+    }
+    case 'EDIT_ITEM': {
+      console.log('Editing item:', action.payload)
+      return { ...state, 
+        items: state.items.map(item => item.id === action.payload.id ? action.payload : item)
+      }
+    }
+    case 'HIDE_ITEM': {
+      const itemToHide = state.items.find(item => item.id === action.payload)
+      console.log('Hiding item:', itemToHide)
+      return { ...state, 
+        items: state.items.map(item => item.id === action.payload ? { ...item, isHidden: true } : item)
+      }
+    }
+    case 'UNHIDE_ITEM': {
+      const itemToUnhide = state.items.find(item => item.id === action.payload)
+      console.log('Unhiding item:', itemToUnhide)
+      return { ...state, 
+        items: state.items.map(item => item.id === action.payload ? { ...item, isHidden: false } : item)
+      }
+    }
+    case 'DELETE_ITEM': {
+      const itemToDelete = state.items.find(item => item.id === action.payload)
+      console.log('Deleting item:', itemToDelete)
+      return { ...state, 
+        items: state.items.filter(item => item.id !== action.payload)
+      }
+    }
     default: return state
   }
 }
+
+// action.payload is different for each action
+// for ADD_ITEM, it's the new item object
+// for EDIT_ITEM, it's the updated item object
+// for HIDE_ITEM and UNHIDE_ITEM, it's the id of the item to hide/unhide
+// for DELETE_ITEM, it's the id of the item to delete
