@@ -1,19 +1,8 @@
 import { useState } from 'react'
 import './ItemCard.css'
 
-function ItemCard() {
+function ItemCard({ item }) {
   const [menuOpen, setMenuOpen] = useState(false)
-
-  // Hardcoded item for design/preview
-  const item = {
-    id: 1,
-    title: 'Inception',
-    category: 'movie',
-    status: 'completed',
-    rating: 9,
-    coverUrl: 'https://loremflickr.com/250/350/inception',
-    notes: 'Mind-bending sci-fi masterpiece'
-  }
 
   return (
     <div className="item-card">
