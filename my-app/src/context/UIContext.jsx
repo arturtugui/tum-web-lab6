@@ -6,6 +6,8 @@ export function UIProvider({ children }) {
   const [showModal, setShowModal] = useState(false)
   const [modalMode, setModalMode] = useState('add') // 'add' or 'edit'
   const [editingItem, setEditingItem] = useState(null)
+  const [showItemView, setShowItemView] = useState(false)
+  const [viewingItem, setViewingItem] = useState(null)
 
   const openAddModal = () => {
     setModalMode('add')
@@ -25,6 +27,16 @@ export function UIProvider({ children }) {
     setModalMode('add')
   }
 
+  const openItemView = (item) => {
+    setViewingItem(item)
+    setShowItemView(true)
+  }
+
+  const closeItemView = () => {
+    setShowItemView(false)
+    setViewingItem(null)
+  }
+
   return (
     <UIContext.Provider value={{
       showModal,
@@ -32,7 +44,11 @@ export function UIProvider({ children }) {
       editingItem,
       openAddModal,
       openEditModal,
-      closeModal
+      closeModal,
+      showItemView,
+      viewingItem,
+      openItemView,
+      closeItemView
     }}>
       {children}
     </UIContext.Provider>

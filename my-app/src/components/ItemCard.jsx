@@ -6,7 +6,7 @@ import './ItemCard.css'
 function ItemCard({ item }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const { dispatch } = useCollection()
-  const { openEditModal } = useUI()
+  const { openEditModal, openItemView } = useUI()
 
   return (
     <div className="item-card">
@@ -26,7 +26,10 @@ function ItemCard({ item }) {
             </button>
             {menuOpen && (
               <div className="dropdown-menu">
-                <button className="menu-item" onClick={() => console.log('Viewing item:', item)}>
+                <button className="menu-item" onClick={() => {
+                  openItemView(item)
+                  setMenuOpen(false)
+                }}>
                   View
                 </button>
                 <button className="menu-item" onClick={() => {

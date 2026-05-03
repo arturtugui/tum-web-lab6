@@ -2,11 +2,12 @@ import Navbar from './components/Navbar'
 import FilterBar from './components/FilterBar'
 import ItemList from './components/ItemList'
 import ItemForm from './components/ItemForm'
+import ItemView from './components/ItemView'
 import { useUI } from './context/UIContext'
 import './styles/App.css'
 
 function App() {
-  const { showModal } = useUI()
+  const { showModal, showItemView } = useUI()
 
   return (
     <div className="app-container">
@@ -16,6 +17,7 @@ function App() {
         <ItemList />
       </div>
       {showModal && <ItemForm />}
+      {showItemView && <ItemView />}
     </div>
   )
 }
