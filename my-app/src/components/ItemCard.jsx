@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useCollection } from '../context/CollectionContext'
 import './ItemCard.css'
 
-function ItemCard({ item }) {
+function ItemCard({ item, onEditClick }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const { dispatch } = useCollection()
 
@@ -27,13 +27,24 @@ function ItemCard({ item }) {
                 <button className="menu-item" onClick={() => console.log('Viewing item:', item)}>
                   View
                 </button>
-                <button className="menu-item" onClick={() => dispatch({ type: 'EDIT_ITEM', payload: item})}>
+                <button className="menu-item" onClick={() => {
+                  onEditClick(item)
+                  setMenuOpen(false)
+                }}>
                   Edit
                 </button>
-                <button className="menu-item" onClick={() => dispatch({ type: 'HIDE_ITEM', payload: item.id })}>
+                <button className="menu-item" onClick={() => {
+                  dispatch({ type: 'HIDE_ITEM', payload: item.id })
+                  setMenuOpen(false)
+                }}>
                   Hide
                 </button>
-                <button className="menu-item menu-item-danger" onClick={() => dispatch({ type: 'DELETE_ITEM', payload: item.id })}>
+                <button className="menu-item menu-item-danger" onClick={() => {
+                  if (window.confirm(`Are you sure you want to delete "${item.title}"? This action cannot be undone.`)) {
+                    dispatch({ type: 'DELETE_ITEM', payload: item.id })
+                  }
+                  setMenuOpen(false)
+                }}>
                   Delete
                 </button>
               </div>
