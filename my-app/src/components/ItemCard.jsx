@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { useCollection } from '../context/CollectionContext'
+import { useUI } from '../context/UIContext'
 import './ItemCard.css'
 
-function ItemCard({ item, onEditClick }) {
+function ItemCard({ item }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const { dispatch } = useCollection()
+  const { openEditModal } = useUI()
 
   return (
     <div className="item-card">
@@ -28,7 +30,7 @@ function ItemCard({ item, onEditClick }) {
                   View
                 </button>
                 <button className="menu-item" onClick={() => {
-                  onEditClick(item)
+                  openEditModal(item)
                   setMenuOpen(false)
                 }}>
                   Edit

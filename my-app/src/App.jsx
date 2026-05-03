@@ -1,45 +1,25 @@
-import { useState } from 'react'
 import Navbar from './components/Navbar'
 import FilterBar from './components/FilterBar'
 import ItemList from './components/ItemList'
 import ItemForm from './components/ItemForm'
+import { useUI } from './context/UIContext'
 import './styles/App.css'
 
 function App() {
-  const [showModal, setShowModal] = useState(false)
-  const [modalMode, setModalMode] = useState('add') // 'add' or 'edit'
-  const [editingItem, setEditingItem] = useState(null)
-
-  const handleOpenAddModal = () => {
-    setModalMode('add')
-    setEditingItem(null)
-    setShowModal(true)
-  }
-
-  const handleOpenEditModal = (item) => {
-    setModalMode('edit')
-    setEditingItem(item)
-    setShowModal(true)
-  }
-
-  const handleCloseModal = () => {
-    setShowModal(false)
-    setEditingItem(null)
-    setModalMode('add')
-  }
+  const { showModal, modalMode, editingItem, closeModal } = useUI()
 
   return (
     <div className="app-container">
-      <Navbar onAddClick={handleOpenAddModal} />
+      <Navbar />
       <FilterBar />
       <div className="main-grid">
-        <ItemList onEditClick={handleOpenEditModal} />
+        <ItemList />
       </div>
       {showModal && (
         <ItemForm
           mode={modalMode}
           item={editingItem}
-          onClose={handleCloseModal}
+          onClose={closeModal}
         />
       )}
     </div>

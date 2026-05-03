@@ -2,7 +2,7 @@ import { useCollection } from '../context/CollectionContext'
 import ItemCard from './ItemCard'
 import './ItemList.css'
 
-function ItemList({ onEditClick }) {
+function ItemList() {
     const { state } = useCollection()
 
     const visible = state.items.filter(item => !item.isHidden)
@@ -13,7 +13,7 @@ function ItemList({ onEditClick }) {
         <div className="item-list">
             {visible.length > 0 ? (
                 visible.map(item => (
-                    <ItemCard key={item.id} item={item} onEditClick={onEditClick} />
+                    <ItemCard key={item.id} item={item} />
                 ))
             ) : hasNoItems ? (
                 <div className="empty-state">
