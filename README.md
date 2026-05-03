@@ -70,3 +70,8 @@ To clear localStorage and reset to default items, run in browser console:
 localStorage.removeItem('pit-collection')
 ```
 Then refresh the page.
+
+## Project Links
+
+- GitHub Pages: https://arturtugui.github.io/tum-web-lab6/
+- Live Website: ...
