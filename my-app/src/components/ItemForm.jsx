@@ -27,6 +27,32 @@ const CATEGORY_FIELDS = {
   youtube: ['channelUrl', 'uploadFrequency']
 }
 
+// Default values for form fields when in "add" mode
+const DEFAULT_VALUES = {
+  title: '',
+  category: 'movie',
+  status: 'planned',
+  rating: null,
+  coverUrl: '',
+  notes: ''
+}
+
+// ============================================================================
+// HELPER FUNCTION: getCategoryFields
+// ============================================================================
+// Purpose: Get the extra fields for a specific category
+// Example: if category is 'game', return { platform: '', developer: '' }
+function getCategoryFields(category, existingItem) {
+  const fields = {}
+  // Look up which fields this category needs from CATEGORY_FIELDS constant
+  const categorySpecific = CATEGORY_FIELDS[category] || []
+  // For each field, add it to our object with the existing value or empty string
+  categorySpecific.forEach(field => {
+    fields[field] = existingItem?.[field] || ''
+  })
+  return fields
+}
+
 // ============================================================================
 // COMPONENT: ItemForm
 // ============================================================================
@@ -46,34 +72,19 @@ function ItemForm() {
   // ========================================================================
   // STATE: formData - holds all the form input values
   // ========================================================================
-  // When editing, pre-fill with existing item data using the optional chaining operator (?.)
-  // When adding, start with empty strings / defaults
-  const [formData, setFormData] = useState({
-    title: item?.title || '',
-    category: item?.category || 'movie',
-    status: item?.status || 'planned',
-    rating: item?.rating || null,
-    coverUrl: item?.coverUrl || '',
-    notes: item?.notes || '',
-    // Also include any category-specific fields (genres, platform, etc.)
-    ...getCategoryFields(item?.category || 'movie', item)
-  })
+  // Build the initial state by merging defaults with any existing item data
+  const initialState = {
+    ...DEFAULT_VALUES,
+    ...(item || {}), // If editing, item values overwrite defaults
+    ...getCategoryFields(item?.category || 'movie', item) // Add category-specific fields
+  }
+
+  const [formData, setFormData] = useState(initialState)
 
   // ========================================================================
-  // HELPER FUNCTION: getCategoryFields
+  // HELPER FUNCTION: getCategoryFields (moved outside component for clarity)
   // ========================================================================
-  // Purpose: Get the extra fields for a specific category
-  // Example: if category is 'game', return { platform: '', developer: '' }
-  function getCategoryFields(category, existingItem) {
-    const fields = {}
-    // Look up which fields this category needs from CATEGORY_FIELDS constant
-    const categorySpecific = CATEGORY_FIELDS[category] || []
-    // For each field, add it to our object with the existing value or empty string
-    categorySpecific.forEach(field => {
-      fields[field] = existingItem?.[field] || ''
-    })
-    return fields
-  }
+  // See function definition at the top of file
 
   // ========================================================================
   // EFFECT: When user changes the category dropdown, update the form fields
@@ -109,8 +120,8 @@ function ItemForm() {
     e.preventDefault()
     
     // VALIDATION: Check that required fields are filled
-    if (!formData.title.trim() || !formData.coverUrl.trim()) {
-      alert('Please fill in title and cover URL')
+    if (!formData.title.trim()) {
+      alert('Please fill in title')
       return
     }
 
