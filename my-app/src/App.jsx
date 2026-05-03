@@ -6,7 +6,7 @@ import { useUI } from './context/UIContext'
 import './styles/App.css'
 
 function App() {
-  const { showModal, modalMode, editingItem, closeModal } = useUI()
+  const { showModal } = useUI()
 
   return (
     <div className="app-container">
@@ -15,13 +15,7 @@ function App() {
       <div className="main-grid">
         <ItemList />
       </div>
-      {showModal && (
-        <ItemForm
-          mode={modalMode}
-          item={editingItem}
-          onClose={closeModal}
-        />
-      )}
+      {showModal && <ItemForm />}
     </div>
   )
 }

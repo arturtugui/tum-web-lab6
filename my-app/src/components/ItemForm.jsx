@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useCollection } from '../context/CollectionContext'
+import { useUI } from '../context/UIContext'
 import './ItemForm.css'
 
 // ============================================================================
@@ -29,13 +30,18 @@ const CATEGORY_FIELDS = {
 // ============================================================================
 // COMPONENT: ItemForm
 // ============================================================================
-// Props:
-//   - mode: 'add' (empty form) or 'edit' (pre-filled with item data)
-//   - item: the item object to edit (only needed when mode='edit')
-//   - onClose: callback function to close the modal when user clicks Cancel or submits
-function ItemForm({ mode = 'add', item = null, onClose }) {
+// No props needed - gets all state directly from UIContext and CollectionContext
+function ItemForm() {
+  // Get modal state and UI actions from UIContext
+  const { modalMode, editingItem, closeModal } = useUI()
+  
   // Get the dispatch function from CollectionContext to send actions to reducer
   const { dispatch } = useCollection()
+  
+  // For easier reading, alias these values
+  const mode = modalMode
+  const item = editingItem
+  const onClose = closeModal
   
   // ========================================================================
   // STATE: formData - holds all the form input values
