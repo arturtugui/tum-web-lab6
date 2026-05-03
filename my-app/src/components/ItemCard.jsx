@@ -24,7 +24,7 @@ function ItemCard({ item }) {
             </button>
             {menuOpen && (
               <div className="dropdown-menu">
-                <button className="menu-item" onClick={() => dispatch({ type: 'VIEW_ITEM', payload: item.id })}>
+                <button className="menu-item" onClick={() => console.log('Viewing item:', item)}>
                   View
                 </button>
                 <button className="menu-item" onClick={() => dispatch({ type: 'EDIT_ITEM', payload: item})}>
