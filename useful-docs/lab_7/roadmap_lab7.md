@@ -87,6 +87,9 @@ Define the data model and create the in-memory store that holds items.
 
 **Deliverable:** Controller functions work correctly when called directly (testable with a simple script).
 
+**⚠️ Important Note:**
+The in-memory store resets when the server restarts. This is fine for development and demos, but understand the limitation: all data is lost on restart. For production, use MongoDB, PostgreSQL, or another persistent database.
+
 ---
 
 ### Stage B3 — JWT Authentication
@@ -202,7 +205,10 @@ Allow the React frontend to call the backend, then wire up Lab 6 to use the API.
 
 **Tasks (Lab 6 frontend — new branch in `tum-web-lab6`):**
 - Create `src/services/api.js` — fetch wrapper with Authorization header for all operations
-- Create `src/services/tokenService.js` — handles storing and retrieving the JWT token
+- Create `src/services/tokenService.js` — handles storing and retrieving the JWT token:
+  - Store token in `localStorage` (key: `pit-token`) or `sessionStorage` for the session
+  - Provide helpers: `getToken()`, `setToken(token)`, `clearToken()`
+  - Consider token expiration: fetch a new token if current one is expired or about to expire
 - Update `CollectionContext.jsx`:
   - On mount: call `GET /items` to load initial data instead of localStorage
   - `ADD_ITEM` → `POST /items` then dispatch
@@ -210,9 +216,42 @@ Allow the React frontend to call the backend, then wire up Lab 6 to use the API.
   - `DELETE_ITEM` → `DELETE /items/:id` then dispatch
   - `HIDE_ITEM` → `PATCH /items/:id/hide` then dispatch
 - Add a simple token gate in the app — on first load call `POST /token` with the current role to get a JWT and store it
-- Handle loading and error states visibly in the UI
+- Handle loading and error states visibly in the UI (show spinner while fetching, display errors)
+- Decide on token storage strategy:
+  - `localStorage`: persists across browser closes (user stays logged in)
+  - `sessionStorage`: cleared when browser closes (user logs out on close)
+  - In-memory only: cleared on page refresh (most secure but less convenient)
 
 **Deliverable:** Lab 6 frontend reads and writes data through the Lab 7 API. localStorage is no longer the source of truth.
+
+---
+
+### Stage B7.5 — Basic Testing (Optional)
+**Branch:** `stage/b7.5-tests`
+
+Add simple test coverage for the API to catch regressions.
+
+**Tasks:**
+- Install testing framework:
+  ```bash
+  npm install --save-dev jest supertest
+  ```
+- Create `tests/` folder with test files:
+  ```
+  tests/
+  ├── auth.test.js       # Test /token endpoint, JWT generation
+  ├── items.test.js      # Test CRUD operations, role-based access
+  └── middleware.test.js # Test auth middleware
+  ```
+- Write basic tests:
+  - Owner token can POST, PUT, DELETE
+  - Viewer token can only GET
+  - Missing token returns 401
+  - Invalid item ID returns 404
+  - Pagination works correctly
+- Add test script to `package.json`: `"test": "jest"`
+
+**Deliverable:** `npm test` runs all tests and reports results. Not strictly required by the assignment, but good practice for reliability.
 
 ---
 
@@ -228,3 +267,4 @@ Allow the React frontend to call the backend, then wire up Lab 6 to use the API.
 | B5 | lab7 | `stage/b5-swagger` | Swagger UI at `/api-docs` |
 | B6 | lab7 | `stage/b6-docker` | Docker + docker-compose |
 | B7 | lab7+lab6 | `stage/b7-integration` | CORS + frontend connected to backend |
+| B7.5 | lab7 | `stage/b7.5-tests` | Basic Jest + supertest coverage (optional) |

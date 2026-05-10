@@ -132,6 +132,25 @@ res.status(201).json({ message: 'Item created', item })
 res.status(404).json({ error: 'Item not found' })
 ```
 
+**Consistent Error Response Format:**
+Always return errors in a predictable structure so clients can handle them uniformly:
+```js
+// Good
+res.status(400).json({ error: 'Invalid role. Must be "owner" or "viewer"' })
+res.status(404).json({ error: 'Item not found', itemId })
+
+// Avoid raw errors
+res.status(500).json(new Error('...'))
+```
+
+**Input Validation:**
+Validate request data before processing:
+```js
+if (!['owner', 'viewer'].includes(req.body.role)) {
+  return res.status(400).json({ error: 'Invalid role' })
+}
+```
+
 ---
 
 ### 4. JWT — JSON Web Tokens
@@ -164,6 +183,14 @@ console.log(decoded.role) // 'owner'
 ```
 
 **Think of it like:** a signed ID card. The server stamps it, and anyone can read it — but only the server can verify it's genuine (because only the server knows the secret key).
+
+**⚠️ Security Note:**
+- Always use a **strong JWT_SECRET** in production (not `'somesecretkey'`). Generate one:
+  ```bash
+  node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+  ```
+- Store `JWT_SECRET` in environment variables, never commit to git
+- Consider token refresh strategies for production (current 1-minute expiry is fine for this demo)
 
 ---
 
@@ -308,10 +335,17 @@ By default browsers block requests from one origin (e.g. `localhost:5173` — yo
 
 ```js
 import cors from 'cors'
-app.use(cors({ origin: 'http://localhost:5173' }))
+app.use(cors({ origin: 'http://localhost:5173' })) // development
 ```
 
 One line. Without it your frontend can't talk to your backend.
+
+**⚠️ Production Note:**
+Hardcoding the origin is fine for development, but in production use environment variables:
+```js
+app.use(cors({ origin: process.env.CORS_ORIGIN }))
+```
+Never allow all origins (`origin: '*'`) in production — it's a security risk.
 
 ---
 
