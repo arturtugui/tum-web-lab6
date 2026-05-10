@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { useCollection } from '../context/CollectionContext'
 import { useUI } from '../context/UIContext'
+import { useRole } from '../context/RoleContext'
 import './ItemCard.css'
 
 function ItemCard({ item }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const { dispatch } = useCollection()
   const { openEditModal, openItemView } = useUI()
+  const { role } = useRole()
 
   return (
     <div className="item-card">
@@ -32,26 +34,30 @@ function ItemCard({ item }) {
                 }}>
                   View
                 </button>
-                <button className="menu-item" onClick={() => {
-                  openEditModal(item)
-                  setMenuOpen(false)
-                }}>
-                  Edit
-                </button>
-                <button className="menu-item" onClick={() => {
-                  dispatch({ type: 'HIDE_ITEM', payload: item.id })
-                  setMenuOpen(false)
-                }}>
-                  Hide
-                </button>
-                <button className="menu-item menu-item-danger" onClick={() => {
-                  if (window.confirm(`Are you sure you want to delete "${item.title}"? This action cannot be undone.`)) {
-                    dispatch({ type: 'DELETE_ITEM', payload: item.id })
-                  }
-                  setMenuOpen(false)
-                }}>
-                  Delete
-                </button>
+                {role === 'owner' && (
+                  <>
+                    <button className="menu-item" onClick={() => {
+                      openEditModal(item)
+                      setMenuOpen(false)
+                    }}>
+                      Edit
+                    </button>
+                    <button className="menu-item" onClick={() => {
+                      dispatch({ type: 'HIDE_ITEM', payload: item.id })
+                      setMenuOpen(false)
+                    }}>
+                      Hide
+                    </button>
+                    <button className="menu-item menu-item-danger" onClick={() => {
+                      if (window.confirm(`Are you sure you want to delete "${item.title}"? This action cannot be undone.`)) {
+                        dispatch({ type: 'DELETE_ITEM', payload: item.id })
+                      }
+                      setMenuOpen(false)
+                    }}>
+                      Delete
+                    </button>
+                  </>
+                )}
               </div>
             )}
           </div>
