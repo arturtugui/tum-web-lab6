@@ -1,17 +1,18 @@
 import { createContext, useContext, useState, useCallback } from 'react'
+import { useError } from './ErrorContext'
 import * as tokenService from '../services/tokenService'
 import * as api from '../services/api'
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
+  const { setError: setGlobalError, clearError } = useError()
   const [token, setToken] = useState(null)
-  const [error, setError] = useState(null)
 
   // Get token for a specific role, refreshing if expired
   const getToken = useCallback(async (role) => {
     try {
-      setError(null)
+      clearError()
       
       // Check if we have a stored token that's still valid
       const storedToken = tokenService.getToken()
@@ -33,18 +34,17 @@ export function AuthProvider({ children }) {
       return newToken
     } catch (err) {
       const errorMsg = err.message || 'Failed to authenticate'
-      setError(errorMsg)
+      setGlobalError(errorMsg)
       throw err
     }
-  }, []) // ← Empty dependency array
-  // It's only created once, so it won't change on re-renders, preventing infinite loops in useEffect() of CollectionContext
+  }, [setGlobalError, clearError])
 
   // Clear token and logout
   const clearToken = useCallback(() => {
     tokenService.clearToken()
     setToken(null)
-    setError(null)
-  }, [])
+    clearError()
+  }, [clearError])
 
   // Get current stored token without refresh
   const getCurrentToken = useCallback(() => {
@@ -55,19 +55,13 @@ export function AuthProvider({ children }) {
     return null
   }, [])
 
-  const clearError = useCallback(() => {
-    setError(null)
-  }, [])
-
   return (
     <AuthContext.Provider
       value={{
         token,
-        error,
         getToken,
         getCurrentToken,
         clearToken,
-        clearError,
       }}
     >
       {children}
