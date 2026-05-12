@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useCollection } from '../context/CollectionContext'
+import { useError } from '../context/ErrorContext'
 import { useUI } from '../context/UIContext'
 import './ItemForm.css'
 
@@ -62,7 +63,10 @@ function ItemForm() {
   const { modalMode, editingItem, closeModal } = useUI()
   
   // Get the API wrapper functions from CollectionContext
-  const { addItem: addItemAPI, editItem: editItemAPI, error, clearError } = useCollection()
+  const { addItem: addItemAPI, editItem: editItemAPI } = useCollection()
+  
+  // Get error and clearError from ErrorContext
+  const { error, clearError } = useError()
   
   // For easier reading, alias these values
   const mode = modalMode
