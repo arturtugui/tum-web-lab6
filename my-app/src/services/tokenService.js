@@ -1,10 +1,4 @@
 const TOKEN_STORAGE_KEY = 'pit-token'
-const TOKEN_STORAGE_KIND_KEY = 'pit-token-storage'
-
-const STORAGE_KIND = {
-  LOCAL: 'local',
-  SESSION: 'session',
-}
 
 function safeBase64UrlDecode(value) {
   try {
@@ -38,39 +32,17 @@ function decodeJwtPayload(token) {
   }
 }
 
-function getStorage(kind = STORAGE_KIND.LOCAL) {
-  return kind === STORAGE_KIND.SESSION ? sessionStorage : localStorage
-}
-
-function getStoredKind() {
-  const rawKind = localStorage.getItem(TOKEN_STORAGE_KIND_KEY)
-  return rawKind === STORAGE_KIND.SESSION ? STORAGE_KIND.SESSION : STORAGE_KIND.LOCAL
-}
-
-export function setToken(token, options = {}) {
-  const kind = options.kind === STORAGE_KIND.SESSION ? STORAGE_KIND.SESSION : STORAGE_KIND.LOCAL
-
+export function setToken(token) {
   clearToken()
-
-  getStorage(kind).setItem(TOKEN_STORAGE_KEY, token)
-  localStorage.setItem(TOKEN_STORAGE_KIND_KEY, kind)
+  sessionStorage.setItem(TOKEN_STORAGE_KEY, token)
 }
 
 export function getToken() {
-  const preferredKind = getStoredKind()
-  const preferred = getStorage(preferredKind).getItem(TOKEN_STORAGE_KEY)
-
-  if (preferred) {
-    return preferred
-  }
-
-  return localStorage.getItem(TOKEN_STORAGE_KEY) || sessionStorage.getItem(TOKEN_STORAGE_KEY)
+  return sessionStorage.getItem(TOKEN_STORAGE_KEY)
 }
 
 export function clearToken() {
-  localStorage.removeItem(TOKEN_STORAGE_KEY)
   sessionStorage.removeItem(TOKEN_STORAGE_KEY)
-  localStorage.removeItem(TOKEN_STORAGE_KIND_KEY)
 }
 
 export function getTokenPayload(token = getToken()) {
@@ -80,12 +52,17 @@ export function getTokenPayload(token = getToken()) {
 export function isTokenExpired(token = getToken(), skewSeconds = 10) {
   const payload = getTokenPayload(token)
 
+  //short for 
+  // if (payload === null || payload === undefined || !payload.exp) {
   if (!payload?.exp) {
     return true
   }
 
   const nowSeconds = Math.floor(Date.now() / 1000)
-  return payload.exp <= nowSeconds + skewSeconds
+  
+  const expiryTime = payload.exp              // when token expires (seconds)
+  const currentTime = nowSeconds + skewSeconds  // now plus a buffer
+  return expiryTime <= currentTime             // true = expired or about to expire
 }
 
 export async function getValidToken(fetchToken, role, options = {}) {
@@ -103,8 +80,8 @@ export async function getValidToken(fetchToken, role, options = {}) {
     throw new Error('Token response is missing token')
   }
 
-  setToken(freshToken, options)
+  setToken(freshToken)
   return freshToken
 }
 
-export { TOKEN_STORAGE_KEY, STORAGE_KIND }
+export { TOKEN_STORAGE_KEY }
