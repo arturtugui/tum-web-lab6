@@ -36,7 +36,8 @@ export function AuthProvider({ children }) {
       setError(errorMsg)
       throw err
     }
-  }, [])
+  }, []) // ← Empty dependency array
+  // It's only created once, so it won't change on re-renders, preventing infinite loops in useEffect() of CollectionContext
 
   // Clear token and logout
   const clearToken = useCallback(() => {

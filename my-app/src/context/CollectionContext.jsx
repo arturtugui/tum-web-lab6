@@ -14,7 +14,10 @@ export function CollectionProvider({ children }) {
   const [error, setError] = useState(null)
 
   // Initialize and load items on mount or role change
+  // useEffect() runs the function when role, getToken change
   useEffect(() => {
+    // This "watches" for role changes
+    // When role changes, fetch new token + items
     const initializeApp = async () => {
       try {
         setLoading(true)
@@ -37,7 +40,7 @@ export function CollectionProvider({ children }) {
     }
 
     initializeApp()
-  }, [role, getToken])
+  }, [role, getToken]) // "Track this dependency"
 
   // Wrapper functions for API mutations
   const addItem = async (item) => {
