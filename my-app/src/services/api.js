@@ -86,7 +86,7 @@ export async function unhideItem(token, id) {
 }
 
 export async function getTokenForRole(role) {
-  return request('/token', {
+  return request('/auth/token', {
     method: 'POST',
     body: { role },
   })
