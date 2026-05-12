@@ -1,98 +1,140 @@
-import { createContext, useContext, useReducer, useEffect } from 'react'
+import { createContext, useContext, useReducer, useEffect, useState } from 'react'
 import { reducer } from '../reducers/collectionReducer'
+import { useRole } from './RoleContext'
+import * as api from '../services/api'
+import * as tokenService from '../services/tokenService'
 
 const CollectionContext = createContext(null)
 
-// Default test data
-const DEFAULT_ITEMS = [
-  {
-    id: 1,
-    title: 'The Boys',
-    category: 'series',
-    status: 'in_progress',
-    coverUrl: 'https://image.tmdb.org/t/p/original/2zmTngn1tYC1AvfnrFLhxeD82hz.jpg',
-  },
-  {
-    id: 2,
-    title: 'Apex Legends',
-    category: 'game',
-    status: 'in_progress',
-    coverUrl: 'https://cdn.cloudflare.steamstatic.com/steam/apps/1172470/header.jpg',
-  },
-  {
-    id: 3,
-    title: 'Resident Evil 2',
-    category: 'game',
-    status: 'completed',
-    coverUrl: 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/883710/library_600x900_2x.jpg',
-  },
-  {
-    id: 4,
-    title: 'Dexter',
-    category: 'series',
-    status: 'completed',
-    coverUrl: 'https://image.tmdb.org/t/p/original/q8dWfc4JwQuv3HayIZeO84jAXED.jpg',
-  },
-  {
-    id: 5,
-    title: "Schindler's List",
-    category: 'movie',
-    status: 'planned',
-    coverUrl: 'https://image.tmdb.org/t/p/original/sF1U4EUQS8YHUYjNl3pMGNIQyr0.jpg',
-  },
-  {
-    id: 6,
-    title: 'Tokyo Ghoul',
-    category: 'manga',
-    status: 'completed',
-    coverUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqf9NgrDpoUTRfA2vfs10ic6T5tJOxoojSptkdHHpxF2aoBaoIxtQYJCwOS1kGkanCa68vOxMmUYrCxryQdgrbz7Vu4R7Z_a6xMbOGPQ39vg&s=10',
-  },
-  {
-    id: 7,
-    title: "Takopi's Original Sin",
-    category: 'anime',
-    status: 'completed',
-    coverUrl: 'https://i0.wp.com/ronitjauthor.com/wp-content/uploads/2025/08/Takopis-Original-Sin-2025-Official-Poster-e1754218186871.webp?resize=540%2C720&ssl=1',
-  },
-  {
-    id: 8,
-    title: 'Supernatural',
-    category: 'series',
-    status: 'dropped',
-    coverUrl: 'https://m.media-amazon.com/images/M/MV5BMDFmMGZmMGItNGRjNC00NjVjLWI5ODEtNzhjMTE5MmJhN2FkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg',
-  },
-]
-
-// Load initial state from localStorage or use default test data
-function getInitialState() {
-  try {
-    const saved = localStorage.getItem('pit-collection')
-    if (saved) {
-      return { items: JSON.parse(saved) }
-    }
-  } catch (error) {
-    console.error('Failed to load from localStorage:', error)
-  }
-  return { items: DEFAULT_ITEMS }
-}
-
-//wrapper for App.jsx to provide collection state and dispatch
-//usage in any component
-//const { state, dispatch } = useCollection()
 export function CollectionProvider({ children }) {
-  const [state, dispatch] = useReducer(reducer, null, getInitialState)
+  const { role } = useRole()
+  const [state, dispatch] = useReducer(reducer, { items: [] })
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
 
-  // Save to localStorage whenever state changes
+  // Initialize token and load items on mount or role change
   useEffect(() => {
-    try {
-      localStorage.setItem('pit-collection', JSON.stringify(state.items))
-    } catch (error) {
-      console.error('Failed to save to localStorage:', error)
+    const initializeApp = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+
+        // Get or refresh token for current role
+        const token = await tokenService.getValidToken(api.getTokenForRole, role)
+
+        // Fetch items from API
+        const response = await api.fetchItems(token)
+        dispatch({ type: 'SET_ITEMS', payload: response.items || [] })
+      } catch (err) {
+        const errorMsg = err.message || 'Failed to initialize app'
+        console.error('App initialization error:', err)
+        setError(errorMsg)
+        // Fall back to empty items on error
+        dispatch({ type: 'SET_ITEMS', payload: [] })
+      } finally {
+        setLoading(false)
+      }
     }
-  }, [state.items])
+
+    initializeApp()
+  }, [role])
+
+  // Wrapper functions for API mutations
+  const addItem = async (item) => {
+    try {
+      setError(null)
+      const token = tokenService.getToken()
+      if (!token) throw new Error('No token available')
+      
+      const response = await api.createItem(token, item)
+      dispatch({ type: 'ADD_ITEM', payload: response.item || response })
+      return response.item || response
+    } catch (err) {
+      const errorMsg = err.message || 'Failed to add item'
+      setError(errorMsg)
+      throw err
+    }
+  }
+
+  const editItem = async (id, updates) => {
+    try {
+      setError(null)
+      const token = tokenService.getToken()
+      if (!token) throw new Error('No token available')
+      
+      const response = await api.updateItem(token, id, updates)
+      dispatch({ type: 'EDIT_ITEM', payload: response.item || { id, ...updates } })
+      return response.item
+    } catch (err) {
+      const errorMsg = err.message || 'Failed to edit item'
+      setError(errorMsg)
+      throw err
+    }
+  }
+
+  const deleteItem = async (id) => {
+    try {
+      setError(null)
+      const token = tokenService.getToken()
+      if (!token) throw new Error('No token available')
+      
+      await api.deleteItem(token, id)
+      dispatch({ type: 'DELETE_ITEM', payload: id })
+    } catch (err) {
+      const errorMsg = err.message || 'Failed to delete item'
+      setError(errorMsg)
+      throw err
+    }
+  }
+
+  const hideItem = async (id) => {
+    try {
+      setError(null)
+      const token = tokenService.getToken()
+      if (!token) throw new Error('No token available')
+      
+      await api.hideItem(token, id)
+      dispatch({ type: 'HIDE_ITEM', payload: id })
+    } catch (err) {
+      const errorMsg = err.message || 'Failed to hide item'
+      setError(errorMsg)
+      throw err
+    }
+  }
+
+  const unhideItem = async (id) => {
+    try {
+      setError(null)
+      const token = tokenService.getToken()
+      if (!token) throw new Error('No token available')
+      
+      await api.unhideItem(token, id)
+      dispatch({ type: 'UNHIDE_ITEM', payload: id })
+    } catch (err) {
+      const errorMsg = err.message || 'Failed to unhide item'
+      setError(errorMsg)
+      throw err
+    }
+  }
+
+  const clearError = () => setError(null)
 
   return (
-    <CollectionContext.Provider value={{ state, dispatch }}>
+    <CollectionContext.Provider 
+      value={{ 
+        state, 
+        dispatch,
+        loading,
+        error,
+        clearError,
+        // API wrapper functions
+        addItem,
+        editItem,
+        deleteItem,
+        hideItem,
+        unhideItem,
+      }}
+    >
       {children}
     </CollectionContext.Provider>
   )

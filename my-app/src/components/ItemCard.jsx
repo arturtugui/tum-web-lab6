@@ -6,9 +6,34 @@ import './ItemCard.css'
 
 function ItemCard({ item }) {
   const [menuOpen, setMenuOpen] = useState(false)
-  const { dispatch } = useCollection()
+  const [isDeleting, setIsDeleting] = useState(false)
+  const { deleteItem: deleteItemAPI, hideItem: hideItemAPI } = useCollection()
   const { openEditModal, openItemView } = useUI()
   const { role } = useRole()
+
+  const handleDelete = async () => {
+    try {
+      setIsDeleting(true)
+      await deleteItemAPI(item.id)
+    } catch (err) {
+      console.error('Delete failed:', err)
+      alert('Failed to delete item')
+    } finally {
+      setIsDeleting(false)
+      setMenuOpen(false)
+    }
+  }
+
+  const handleHide = async () => {
+    try {
+      await hideItemAPI(item.id)
+    } catch (err) {
+      console.error('Hide failed:', err)
+      alert('Failed to hide item')
+    } finally {
+      setMenuOpen(false)
+    }
+  }
 
   return (
     <div className="item-card">
@@ -42,19 +67,25 @@ function ItemCard({ item }) {
                     }}>
                       Edit
                     </button>
-                    <button className="menu-item" onClick={() => {
-                      dispatch({ type: 'HIDE_ITEM', payload: item.id })
-                      setMenuOpen(false)
-                    }}>
+                    <button 
+                      className="menu-item" 
+                      onClick={handleHide}
+                      disabled={isDeleting}
+                    >
                       Hide
                     </button>
-                    <button className="menu-item menu-item-danger" onClick={() => {
-                      if (window.confirm(`Are you sure you want to delete "${item.title}"? This action cannot be undone.`)) {
-                        dispatch({ type: 'DELETE_ITEM', payload: item.id })
-                      }
-                      setMenuOpen(false)
-                    }}>
-                      Delete
+                    <button 
+                      className="menu-item menu-item-danger" 
+                      onClick={() => {
+                        if (window.confirm(`Are you sure you want to delete "${item.title}"? This action cannot be undone.`)) {
+                          handleDelete()
+                        } else {
+                          setMenuOpen(false)
+                        }
+                      }}
+                      disabled={isDeleting}
+                    >
+                      {isDeleting ? 'Deleting...' : 'Delete'}
                     </button>
                   </>
                 )}

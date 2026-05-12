@@ -7,6 +7,10 @@
 
 export function reducer(state, action) {
   switch (action.type) {
+    case 'SET_ITEMS': {
+      // Used for loading items from API on mount
+      return { ...state, items: action.payload }
+    }
     case 'ADD_ITEM': {
       console.log('Adding item:', action.payload)
       return { ...state, 

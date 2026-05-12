@@ -25,3 +25,5 @@ dist-ssr
 
 # Copilot said so
 .vite/
+
+.env
