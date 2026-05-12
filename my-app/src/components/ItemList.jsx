@@ -1,10 +1,11 @@
 import { useCollection } from '../context/CollectionContext'
 import { useFilter } from '../context/FilterContext'
 import ItemCard from './ItemCard'
+import { Pagination } from './Pagination'
 import './ItemList.css'
 
 function ItemList() {
-    const { state } = useCollection()
+    const { state, currentPage, setCurrentPage, total, itemsPerPage } = useCollection()
     const { activeCategory, activeStatus, searchText } = useFilter()
 
     // Apply filtering logic
@@ -26,13 +27,21 @@ function ItemList() {
 
     const hasNoItems = state.items.length === 0
     const hasNoResults = state.items.length > 0 && filtered.length === 0
+    const totalPages = Math.ceil(total / itemsPerPage)
 
     return (
         <div className="item-list">
             {filtered.length > 0 ? (
-                filtered.map(item => (
-                    <ItemCard key={item.id} item={item} />
-                ))
+                <>
+                    {filtered.map(item => (
+                        <ItemCard key={item.id} item={item} />
+                    ))}
+                    <Pagination 
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                    />
+                </>
             ) : hasNoItems ? (
                 <div className="empty-state">
                     <div className="empty-state-icon">📦</div>
