@@ -61,13 +61,16 @@ function ItemForm() {
   // Get modal state and UI actions from UIContext
   const { modalMode, editingItem, closeModal } = useUI()
   
-  // Get the dispatch function from CollectionContext to send actions to reducer
-  const { dispatch } = useCollection()
+  // Get the API wrapper functions from CollectionContext
+  const { addItem: addItemAPI, editItem: editItemAPI, error, clearError } = useCollection()
   
   // For easier reading, alias these values
   const mode = modalMode
   const item = editingItem
   const onClose = closeModal
+  
+  // Add loading state for form submission
+  const [isSubmitting, setIsSubmitting] = useState(false)
   
   // ========================================================================
   // STATE: formData - holds all the form input values
@@ -85,6 +88,15 @@ function ItemForm() {
   // HELPER FUNCTION: getCategoryFields (moved outside component for clarity)
   // ========================================================================
   // See function definition at the top of file
+
+  // ========================================================================
+  // EFFECT: Clear error when modal closes
+  // ========================================================================
+  useEffect(() => {
+    if (!mode) {
+      clearError()
+    }
+  }, [mode, clearError])
 
   // ========================================================================
   // EFFECT: When user changes the category dropdown, update the form fields
@@ -115,7 +127,7 @@ function ItemForm() {
   // ========================================================================
   // EVENT HANDLER: handleSubmit - Handle form submission (Add/Edit button)
   // ========================================================================
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     // Prevent page reload on form submit
     e.preventDefault()
     
@@ -125,32 +137,41 @@ function ItemForm() {
       return
     }
 
-    // BUILD PAYLOAD: Create the object to send to the reducer
-    const payload = {
-      ...formData, // Include all form data
-      // For add mode: create new ID (timestamp + random); for edit: keep existing ID
-      id: mode === 'edit' ? item.id : Date.now() + Math.random(),
-      // For add mode: always unhidden; for edit: keep existing hidden status
-      isHidden: mode === 'edit' ? item.isHidden : false
-    }
+    try {
+      setIsSubmitting(true)
+      clearError()
 
-    // CLEAN UP: Remove empty category-specific fields from payload
-    // This prevents sending empty strings for unused fields
-    Object.keys(payload).forEach(key => {
-      if (payload[key] === '') {
-        delete payload[key]
+      // BUILD PAYLOAD: Create the object to send to the API
+      const payload = {
+        ...formData,
+        // For add mode: create new ID (timestamp + random); for edit: keep existing ID
+        id: mode === 'edit' ? item.id : Date.now() + Math.random(),
+        // For add mode: always unhidden; for edit: keep existing hidden status
+        isHidden: mode === 'edit' ? item.isHidden : false
       }
-    })
 
-    // DISPATCH: Send action to reducer with the payload
-    if (mode === 'add') {
-      dispatch({ type: 'ADD_ITEM', payload })
-    } else {
-      dispatch({ type: 'EDIT_ITEM', payload })
+      // CLEAN UP: Remove empty category-specific fields from payload
+      Object.keys(payload).forEach(key => {
+        if (payload[key] === '') {
+          delete payload[key]
+        }
+      })
+
+      // CALL API: Send to server and dispatch to state
+      if (mode === 'add') {
+        await addItemAPI(payload)
+      } else {
+        await editItemAPI(item.id, payload)
+      }
+
+      // Close the modal after successful submission
+      onClose()
+    } catch (err) {
+      console.error('Form submission error:', err)
+      // Error message is already set in context
+    } finally {
+      setIsSubmitting(false)
     }
-
-    // Close the modal after successful submission
-    onClose()
   }
 
   // Get the category-specific fields for current selected category
@@ -168,8 +189,22 @@ function ItemForm() {
         {/* Header: Title and close button */}
         <div className="modal-header">
           <h2>{mode === 'add' ? 'Add Item' : 'Edit Item'}</h2>
-          <button className="btn-close" onClick={onClose}>✕</button>
+          <button className="btn-close" onClick={onClose} disabled={isSubmitting}>✕</button>
         </div>
+
+        {/* Error display */}
+        {error && (
+          <div style={{ 
+            padding: '10px', 
+            marginBottom: '10px', 
+            backgroundColor: '#fee', 
+            color: '#c33', 
+            borderRadius: '4px',
+            fontSize: '14px'
+          }}>
+            {error}
+          </div>
+        )}
 
         {/* Form container */}
         <form onSubmit={handleSubmit} className="item-form">
@@ -294,11 +329,11 @@ function ItemForm() {
 
           {/* ===== FORM ACTIONS (Cancel & Submit buttons) ===== */}
           <div className="form-actions">
-            <button type="button" className="btn-cancel" onClick={onClose}>
+            <button type="button" className="btn-cancel" onClick={onClose} disabled={isSubmitting}>
               Cancel
             </button>
-            <button type="submit" className="btn-submit">
-              {mode === 'add' ? 'Add Item' : 'Update Item'}
+            <button type="submit" className="btn-submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Submitting...' : (mode === 'add' ? 'Add Item' : 'Update Item')}
             </button>
           </div>
         </form>
