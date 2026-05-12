@@ -50,7 +50,7 @@ export function CollectionProvider({ children }) {
       clearError()
       const token = await getToken(role)
       
-      const response = await api.createItem(token, item)
+      const response = await api.createItem(token, item, () => getToken(role))
       dispatch({ type: 'ADD_ITEM', payload: response.item || response })
       return response.item || response
     } catch (err) {
@@ -65,7 +65,7 @@ export function CollectionProvider({ children }) {
       clearError()
       const token = await getToken(role)
       
-      const response = await api.updateItem(token, id, updates)
+      const response = await api.updateItem(token, id, updates, () => getToken(role))
       dispatch({ type: 'EDIT_ITEM', payload: response.item || { id, ...updates } })
       return response.item
     } catch (err) {
@@ -80,7 +80,7 @@ export function CollectionProvider({ children }) {
       clearError()
       const token = await getToken(role)
       
-      await api.deleteItem(token, id)
+      await api.deleteItem(token, id, () => getToken(role))
       dispatch({ type: 'DELETE_ITEM', payload: id })
     } catch (err) {
       const errorMsg = err.message || 'Failed to delete item'
@@ -94,7 +94,7 @@ export function CollectionProvider({ children }) {
       clearError()
       const token = await getToken(role)
       
-      await api.hideItem(token, id)
+      await api.hideItem(token, id, () => getToken(role))
       dispatch({ type: 'HIDE_ITEM', payload: id })
     } catch (err) {
       const errorMsg = err.message || 'Failed to hide item'
@@ -108,7 +108,7 @@ export function CollectionProvider({ children }) {
       clearError()
       const token = await getToken(role)
       
-      await api.unhideItem(token, id)
+      await api.unhideItem(token, id, () => getToken(role))
       dispatch({ type: 'UNHIDE_ITEM', payload: id })
     } catch (err) {
       const errorMsg = err.message || 'Failed to unhide item'
