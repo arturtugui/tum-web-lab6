@@ -33,9 +33,11 @@ function ItemList() {
         <div className="item-list">
             {filtered.length > 0 ? (
                 <>
-                    {filtered.map(item => (
-                        <ItemCard key={item.id} item={item} />
-                    ))}
+                    <div className="item-list-grid">
+                        {filtered.map(item => (
+                            <ItemCard key={item.id} item={item} />
+                        ))}
+                    </div>
                     <Pagination 
                         currentPage={currentPage}
                         totalPages={totalPages}
